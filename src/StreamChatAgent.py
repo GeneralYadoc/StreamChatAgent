@@ -1,72 +1,107 @@
 import time
 import threading
 import queue
+import math
 import pytchat
 
-class StreamChatAgent:
+class StreamChatAgent(threading.Thread):
   def __init__( self,
                 video_id,
                 get_item_cb,
                 pre_filter_cb=None,
                 post_filter_cb=None,
-                max_queue_size=0,
-                interval_sec=0.001 ):
-    self.get_item_cb = get_item_cb
-    self.pre_filter_cb = pre_filter_cb
-    self.post_filter_cb = post_filter_cb
-    self.item_queue = queue.Queue(max_queue_size)
-    self.interval_sec = interval_sec
-    self.alive = False
+                max_queue_size=1000,
+                interval_sec=0.01 ):
+    self.__get_item_cb = get_item_cb
+    self.__pre_filter_cb = pre_filter_cb
+    self.__post_filter_cb = post_filter_cb
+    self.__item_queue = queue.Queue(max_queue_size)
+    self.__interval_sec = interval_sec
+    self.__keeping_connection = False
 
-    self.chat = pytchat.create(video_id=video_id)
+    self.__chat = pytchat.create(video_id=video_id)
 
-    self.my_put_thread = threading.Thread(target=self.put_items)
-    self.my_get_thread = threading.Thread(target=self.get_items)
+    self.__my_put_thread = threading.Thread(target=self.__put_items)
+    self.__my_get_thread = threading.Thread(target=self.__get_items)
+
+    super(StreamChatAgent, self).__init__(daemon=True)
 
   def connect(self):
-    self.alive = True
-    self.my_put_thread.start()
-    self.my_get_thread.start()
-    self.my_get_thread.join()
-    self.my_put_thread.join()
+    self.start()
+    self.join()
+
+  def run(self):
+    self.__keeping_connection = True
+    self.__my_put_thread.start()
+    self.__my_get_thread.start()
+    self.__my_get_thread.join()
+    self.__my_put_thread.join()
 
   def disconnect(self):
-    self.alive = False
+    self.__keeping_connection = False
 
-  def is_chat_alive(self, immediate=False, retry_count=5, sleep=1.0):
+  def __is_alive(self, immediate=True, wait_sec=0):
+    if not self.__my_get_thread.is_alive() and not self.__my_put_thread.is_alive():
+      return False
+    
+    retry_count = math.floor(wait_sec / 0.01)
     if immediate:
       retry_count=1
+    
+    steps = 0 if retry_count == 0 else 1
     i = 0
     while True:
-      if not self.alive:
+      if not self.__keeping_connection:
         return False
-      if self.chat.is_alive():
+      if self.__chat.is_alive():
         return True
-      i += 1
-      if retry_count > 0 and i >= retry_count:
+      i += steps
+      if retry_count != 0 and i >= retry_count:
         return False
-      time.sleep(sleep)
+      time.sleep(0.01)
 
-  def put_items(self):
-    while self.alive and self.is_chat_alive():
-      for c in self.chat.get().sync_items():
-        if not self.alive:
+  def __put_items(self):
+    start_time = time.time()
+    while self.__is_alive(immediate=False):
+      for c in self.__chat.get().sync_items():
+        if not self.__keeping_connection:
           break
         prefiltered_c = c
-        if self.pre_filter_cb:
-          prefiltered_c =  self.pre_filter_cb(c)
+        if self.__pre_filter_cb:
+          prefiltered_c =  self.__pre_filter_cb(c)
         if prefiltered_c:
-          if self.item_queue.full():
-            self.item_queue.get()
-          self.item_queue.put(prefiltered_c)
+          if self.__item_queue.full():
+            self.__item_queue.get()
+          self.__item_queue.put(prefiltered_c)
+      self.__sleep_from(start_time)
+      start_time = time.time()
+    self.__keeping_connection = False
 
-  def get_items(self):
-    while self.alive and self.is_chat_alive():
-      while self.alive and not self.item_queue.empty():
-        c = self.item_queue.get()
+
+  def __get_items(self):
+    start_time = time.time()
+    while self.__is_alive(immediate=False):
+      while self.__keeping_connection and not self.__item_queue.empty():
+        c = self.__item_queue.get()
         postfiltered_c = c
-        if self.post_filter_cb:
-          postfiltered_c = self.post_filter_cb(c)
+        if self.__post_filter_cb:
+          postfiltered_c = self.__post_filter_cb(c)
         if postfiltered_c:
-          self.get_item_cb(postfiltered_c)
-      time.sleep(self.interval_sec)
+          self.__get_item_cb(postfiltered_c)
+      self.__sleep_from(start_time, 0.01)
+      start_time = time.time()
+    self.__keeping_connection = False
+
+  def __sleep_from(self, start_time, interval_sec=None):
+    if not interval_sec:
+      interval_sec = self.__interval_sec
+    cur_time = time.time()
+    sleep = interval_sec - (cur_time - start_time)
+    if sleep > 0.:
+      sleep_counter = math.floor(sleep * 10)
+      sleep_frac = sleep - (sleep_counter / 10.)
+      for i in range(sleep_counter):
+        if not self.__keeping_connection:
+          break
+        time.sleep(0.1)
+      time.sleep(sleep_frac)
