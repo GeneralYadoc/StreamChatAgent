@@ -6,6 +6,15 @@ YouTube chat poller which can get massages very smothly by using internal queue.
 - natively obtain high performance by using internal queue.
 
 ## Hou to install
+You can select from following ways.
+
+### Install from PyPI
+- Install package to your environment.<br>
+    ```install
+    $ pip install streamchat-agent
+    ```
+
+### Install from GitHub repository
 - Clone this repository.<br>
     ```clone
     $ clone https://github.com/GeneralYadoc/StreamChatAgent.git
@@ -21,7 +30,7 @@ YouTube chat poller which can get massages very smothly by using internal queue.
 
 ## How to use
 
-- Sample codes
+- Sample codes exists [here](samples/sample.py)<br>
     ``` sample.py
     import sys
     import re
@@ -77,7 +86,7 @@ YouTube chat poller which can get massages very smothly by using internal queue.
 
 - Output of the sample
     ```output
-    % ./test.py MB57rMXXXXs
+    % python3 ./sample.py MB57rMXXXXs
     2023-05-19 05:21:26 [John]- Hello!
     2023-05-19 05:21:27 [Kelly]- Hello everyone!
     2023-05-19 05:21:27 [Taro]- Welcome to our stream.
