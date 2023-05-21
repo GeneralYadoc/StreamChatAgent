@@ -36,23 +36,23 @@ You can select from following ways.
     import re
     import StreamChatAgent as sca  # Import this.
 
-    # callback for getting YouTube chat items
+    # callback for getting YouTube chat item
     # You can implement several processes in it.
     # This example prints datetime, ahthor name, message, of each item.
     def get_item_cb(c):
       print(f"{c.datetime} [{c.author.name}]- {c.message}")
 
     # pre putting queue filter
-    # You can edit YouTube chat items before putting internal queue.
+    # You can edit YouTube chat item before putting internal queue.
     # You can avoid putting internal queue by returning None.
-    # This example removes items whose message consists of stamps only.
+    # This example removes item whose message consists of stamps only.
     def pre_filter_cb(c):
       return None if re.match(r'^(:[^:]+:)+$', c.message) else c
 
     # post getting queue filter
-    # You can edit YouTube chat items after popping internal queue.
-    # You can avoid sending items to get_item_cb by returning None.
-    # This example removes stamps from message of items.
+    # You can edit YouTube chat item after popping internal queue.
+    # You can avoid sending item to get_item_cb by returning None.
+    # This example removes stamps from message of item.
     def post_filter_cb(c):
       c.message = re.sub(r':[^:]+:','', c.message)
       return c
@@ -125,23 +125,22 @@ You can select from following ways.
 And other [threading.Thread](https://docs.python.org/3/library/threading.html) public pethods are available.
 
 ## Callbacks
-### get_item_callback
+### get_item_cb
 - Callback for getting YouTube chat items.
 - You can implement several processes in it.
 - YouTube chat item is thrown as an argument.
 - It's not be assumed that any values are returned.
-### pre_filter_callback
+### pre_filter_cb
 - pre putting queue filter.
 - YouTube chat item is thrown as an argument.
 - You can edit YouTube chat items before putting internal queue.
 - It's required that edited chat item is returned.
 - You can avoid putting internal queue by returning None.
-### post_filter_callback
+### post_filter_cb
 - post getting queue filter
 - You can edit YouTube chat items after popping internal queue.
 - It's required that edited chat item is returned.
-- You can avoid sending items to get_item_cb by returning None.
-
+- You can avoid sending item to get_item_cb by returning None.
 
 ## Type of YouTube Chat item
 - Please refer [pytchat README](https://github.com/taizan-hokuto/pytchat)
