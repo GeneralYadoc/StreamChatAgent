@@ -16,7 +16,7 @@ YouTube chat poller which can get massages very smothly by using internal queue.
     ```
 - Install package to your environment.<br>
     ```install
-    pip install .
+    $ pip install .
     ```
 
 ## How to use
