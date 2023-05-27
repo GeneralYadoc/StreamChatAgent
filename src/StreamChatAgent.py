@@ -3,23 +3,28 @@ import threading
 import queue
 import math
 import pytchat
+from typing import Callable
+from dataclasses import dataclass
+
+@dataclass
+class params:
+  video_id: str
+  get_item_cb: Callable[[any,],None]
+  pre_filter_cb: Callable[[any,],any] = None
+  post_filter_cb: Callable[[any,],any] = None
+  max_queue_size: int = 1000
+  interval_sec: float = 0.01
 
 class StreamChatAgent(threading.Thread):
-  def __init__( self,
-                video_id,
-                get_item_cb,
-                pre_filter_cb=None,
-                post_filter_cb=None,
-                max_queue_size=1000,
-                interval_sec=0.01 ):
-    self.__get_item_cb = get_item_cb
-    self.__pre_filter_cb = pre_filter_cb
-    self.__post_filter_cb = post_filter_cb
-    self.__item_queue = queue.Queue(max_queue_size)
-    self.__interval_sec = interval_sec
+  def __init__( self, params ):
+    self.__get_item_cb = params.get_item_cb
+    self.__pre_filter_cb = params.pre_filter_cb
+    self.__post_filter_cb = params.post_filter_cb
+    self.__item_queue = queue.Queue(params.max_queue_size)
+    self.__interval_sec = params.interval_sec
     self.__keeping_connection = False
 
-    self.__chat = pytchat.create(video_id=video_id)
+    self.__chat = pytchat.create(video_id=params.video_id)
 
     self.__my_put_thread = threading.Thread(target=self.__put_items)
     self.__my_get_thread = threading.Thread(target=self.__get_items)
