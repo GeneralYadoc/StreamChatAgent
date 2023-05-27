@@ -12,7 +12,7 @@ def _requires_from_file(filename):
 
 setup(
     name="streamchat-agent",
-    version="1.0.0",
+    version="1.0.1",
     license="MIT",
     description="Get YouTube chat comments with minimum time lag",
     author="General Yadoc",

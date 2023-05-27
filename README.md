@@ -100,7 +100,7 @@ You can select from following ways.
     | name | description | default |
     |------|------------|---------|
     | video_id | String following after 'v=' in url of target YouTube live | - |
-    | get_item_cb | Chat items are thrown to this callback | - |
+    | get_item_cb | Chat items are thrown to this callback | None |
     | pre_filter_cb | Filter set before internal queue | None |
     | post_filter_cb | Filter set between internal queue and get_item_cb | None |
     | max_queue_size | Max slots of internal queue (0 is no limit) | 1000 |

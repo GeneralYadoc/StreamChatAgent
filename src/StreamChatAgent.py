@@ -9,7 +9,7 @@ from dataclasses import dataclass
 @dataclass
 class params:
   video_id: str
-  get_item_cb: Callable[[any,],None]
+  get_item_cb: Callable[[any,],None] = None
   pre_filter_cb: Callable[[any,],any] = None
   post_filter_cb: Callable[[any,],any] = None
   max_queue_size: int = 1000
@@ -91,7 +91,7 @@ class StreamChatAgent(threading.Thread):
         postfiltered_c = c
         if self.__post_filter_cb:
           postfiltered_c = self.__post_filter_cb(c)
-        if postfiltered_c:
+        if postfiltered_c and self.__get_item_cb:
           self.__get_item_cb(postfiltered_c)
       self.__sleep_from(start_time, 0.01)
       start_time = time.time()
