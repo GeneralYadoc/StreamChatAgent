@@ -95,7 +95,7 @@ You can select from following ways.
     2023-05-19 05:21:27 [Taro]- Welcome to our stream.
     ```
 ## Params given to Constructor
-- StreamChatAgent object can be configured with following arguments of its constractor.
+- StreamChatAgent object can be configured with following params given to constructor.
 
     | name | description | default |
     |------|------------|---------|
