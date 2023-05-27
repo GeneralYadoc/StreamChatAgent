@@ -28,10 +28,13 @@ if len(sys.argv) <= 1:
   exit(0)
 
 # Create StreamChatAgent instance.
-agent = sca.StreamChatAgent( video_id=sys.argv[1],
-                             get_item_cb=get_item_cb,
-                             pre_filter_cb=pre_filter_cb,
-                             post_filter_cb=post_filter_cb )
+params = sca.params(
+  video_id = sys.argv[1],
+  get_item_cb = get_item_cb,
+  pre_filter_cb = pre_filter_cb,
+  post_filter_cb = post_filter_cb
+)
+agent = sca.StreamChatAgent( params )
 
 # Start async getting YouTube chat items.
 # Then get_item_cb is called continuosly.

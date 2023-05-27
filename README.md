@@ -62,10 +62,13 @@ You can select from following ways.
       exit(0)
 
     # Create StreamChatAgent instance.
-    agent = sca.StreamChatAgent( video_id=sys.argv[1],
-                                 get_item_cb=get_item_cb,
-                                 pre_filter_cb=pre_filter_cb,
-                                 post_filter_cb=post_filter_cb )
+    params = sca.params(
+      video_id = sys.argv[1],
+      get_item_cb = get_item_cb,
+      pre_filter_cb = pre_filter_cb,
+      post_filter_cb = post_filter_cb
+    )
+    agent = sca.StreamChatAgent( params )
 
     # Start async getting YouTube chat items.
     # Then get_item_cb is called continuosly.
@@ -91,8 +94,8 @@ You can select from following ways.
     2023-05-19 05:21:27 [Kelly]- Hello everyone!
     2023-05-19 05:21:27 [Taro]- Welcome to our stream.
     ```
-## Arguments of Constractor
-- StreamChatAgent object can be configured with following arguments of its constractor.
+## Params given to Constructor
+- StreamChatAgent object can be configured with following params given to constructor.
 
     | name | description | default |
     |------|------------|---------|
