@@ -5,7 +5,7 @@ YouTube chat poller which can get massages very smothly by using internal queue.
 - receive YouTube chat messages continiously by registering callback.
 - natively obtain high performance by using internal queue.
 
-## Hou to install
+## How to install
 You can select from following ways.
 
 ### Install from PyPI
