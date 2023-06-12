@@ -26,8 +26,8 @@ class StreamChatAgent(threading.Thread):
 
     self.__chat = pytchat.create(video_id=params.video_id)
 
-    self.__my_put_thread = threading.Thread(target=self.__put_items)
-    self.__my_get_thread = threading.Thread(target=self.__get_items)
+    self.__my_put_thread = threading.Thread(target=self.__put_items, daemon=True)
+    self.__my_get_thread = threading.Thread(target=self.__get_items, daemon=True)
 
     super(StreamChatAgent, self).__init__(daemon=True)
 
